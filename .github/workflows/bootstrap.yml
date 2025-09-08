@@ -16,7 +16,6 @@ jobs:
   bootstrap:
     name: 'Bootstrap State Bucket'
     runs-on: ubuntu-latest
-    environment: production
 
     defaults:
       run:
