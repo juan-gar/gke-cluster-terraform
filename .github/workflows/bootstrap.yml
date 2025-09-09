@@ -22,24 +22,15 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
+      uses: google-github-actions/auth@v3
       with:
         workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
         service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GCS }}
+        project_id: juangar-sandbox
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: Verify Authentication
-      run: |
-        echo "Current gcloud auth:"
-        gcloud auth list
-        echo "Current project config:"
-        gcloud config list
-        echo "Testing storage permissions..."
-        gcloud storage buckets list --project=juangar-sandbox --limit=1 || echo "Storage list failed"
-        echo "Testing bucket creation permissions..."
-        gcloud alpha storage buckets describe gs://juangar-sandbox-terraform-state --project=juangar-sandbox 2>/dev/null && echo "Bucket already exists" || echo "Bucket does not exist, creation should be allowed"
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
