@@ -13,4 +13,5 @@ variable "region" {
 variable "service_account_email" {
   description = "The service account email that will access the state bucket."
   type        = string
+  default     = "gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
 }
