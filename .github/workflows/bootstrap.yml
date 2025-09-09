@@ -26,7 +26,7 @@ jobs:
       with:
         workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
         service_account: gcs-sa@sandbox-juangar.iam.gserviceaccount.com
-        project_id: juangar-sandbox
+        project_id: sandbox-juangar
         token_format: 'access_token'
 
     - name: Set up Cloud SDK
