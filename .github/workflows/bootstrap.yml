@@ -2,11 +2,6 @@ name: 'Bootstrap - Deploy State Bucket'
 
 on:
   workflow_dispatch:
-    inputs:
-      service_account_email:
-        description: 'Service account email for state bucket access'
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -30,7 +25,7 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GCS }}
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
@@ -54,10 +49,10 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color -input=false -var="service_account_email=${{ inputs.service_account_email }}"
+      run: terraform plan -no-color -input=false -var="service_account_email=${{ secrets.WIF_SERVICE_ACCOUNT }}"
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false -var="service_account_email=${{ inputs.service_account_email }}"
+      run: terraform apply -auto-approve -input=false -var="service_account_email=${{ secrets.WIF_SERVICE_ACCOUNT }}"
 
     - name: Output State Bucket Name
       run: terraform output state_bucket_name
