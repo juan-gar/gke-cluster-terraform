@@ -25,7 +25,7 @@ jobs:
       uses: google-github-actions/auth@v3
       with:
         workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GCS }}
+        service_account: gcs-sa@sandbox-juangar.iam.gserviceaccount.com
         project_id: juangar-sandbox
         token_format: 'access_token'
 
