@@ -18,7 +18,7 @@ resource "google_storage_bucket" "terraform_state" {
   location = "US"
 
   uniform_bucket_level_access = true
-  
+
   versioning {
     enabled = true
   }
