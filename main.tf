@@ -1,4 +1,19 @@
 
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+  
+  backend "gcs" {
+    bucket = "juangar-sandbox-terraform-state"
+    prefix = "gke-cluster"
+  }
+}
+
 # Configure the Google Cloud provider to manage resources.
 provider "google" {
   project = var.project_id
