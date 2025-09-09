@@ -42,8 +42,8 @@ resource "google_storage_bucket" "terraform_state" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "terraform_state_admin" {
+/* resource "google_storage_bucket_iam_member" "terraform_state_admin" {
   bucket = google_storage_bucket.terraform_state.name
   role   = "roles/storage.admin"
   member = "serviceAccount:${var.service_account_email}"
-}
+} */
