@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "The Google Cloud project ID to deploy the resources in."
   type        = string
-  default     = "sandbox-juangar"  # Replace with your actual project ID
+  default     = "sandbox-juangar" # Replace with your actual project ID
 }
 
 variable "region" {
