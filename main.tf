@@ -10,7 +10,7 @@ terraform {
   
   backend "gcs" {
     bucket = "sandbox-juangar-terraform-state"
-    prefix = "gke-cluster"
+    prefix = "terraform/state"
   }
 }
 
