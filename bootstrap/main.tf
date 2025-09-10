@@ -1,4 +1,8 @@
 terraform {
+    backend "gcs" {
+    bucket = "sandbox-juangar-terraform-state"
+    prefix = "terraform/state"  # Optional: organize state files
+  }
   required_version = ">= 1.0"
   required_providers {
     google = {
