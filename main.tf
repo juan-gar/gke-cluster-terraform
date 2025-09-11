@@ -7,7 +7,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
+
   backend "gcs" {
     bucket = "sandbox-juangar-terraform-state"
     prefix = "terraform/state"
@@ -68,7 +68,7 @@ resource "google_container_node_pool" "primary_nodes" {
     # This allows pods in this node pool to use the GKE Workload Identity feature.
     workload_metadata_config {
       mode = "GKE_METADATA"
-    } 
+    }
 
     # Define the OAuth scopes for the node service account.
     # 'cloud-platform' provides full access to all Cloud APIs.
