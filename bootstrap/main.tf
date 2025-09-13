@@ -1,8 +1,4 @@
 terraform {
-  backend "gcs" {
-    bucket = "sandbox-juangar-terraform-state"
-    prefix = "terraform/state" # Optional: organize state files
-  }
   required_version = ">= 1.0"
   required_providers {
     google = {
@@ -10,6 +6,12 @@ terraform {
       version = "~> 5.0"
     }
   }
+  
+  # Uncomment after bucket is created to migrate bootstrap state
+  # backend "gcs" {
+  #   bucket = "sandbox-juangar-terraform-state"
+  #   prefix = "bootstrap"
+  # }
 }
 
 provider "google" {
