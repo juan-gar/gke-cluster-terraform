@@ -7,11 +7,6 @@ terraform {
     }
   }
   
-  # Uncomment after bucket is created to migrate bootstrap state
-  # backend "gcs" {
-  #   bucket = "sandbox-juangar-terraform-state"
-  #   prefix = "bootstrap"
-  # }
 }
 
 provider "google" {
