@@ -52,3 +52,5 @@ resource "google_storage_bucket" "terraform_state" {
   role   = "roles/storage.admin"
   member = "serviceAccount:${var.service_account_email}"
 } */
+
+##

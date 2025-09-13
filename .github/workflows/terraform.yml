@@ -10,6 +10,8 @@ on:
 permissions:
   contents: read
   id-token: write
+  issues: write
+  pull-requests: write
 
 jobs:
   terraform:
@@ -83,8 +85,8 @@ jobs:
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
-            owner: context.owner,
-            repo: context.repo,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             body: output
           })
 
