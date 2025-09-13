@@ -6,7 +6,11 @@ terraform {
       version = "~> 5.0"
     }
   }
-
+  
+  backend "gcs" {
+    bucket = "sandbox-juangar-terraform-state"
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {
