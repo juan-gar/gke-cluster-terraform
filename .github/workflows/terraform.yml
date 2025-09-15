@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 permissions:
   contents: read
@@ -15,7 +24,7 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform - ${{ github.event.inputs.action || github.event_name }}'
     runs-on: ubuntu-latest
 
     defaults:
@@ -57,7 +66,12 @@ jobs:
     - name: Terraform Plan
       id: plan
       if: github.event_name == 'pull_request'
-      run: terraform plan -no-color -input=false
+      run: |
+        if [ "${{ inputs.action }}" == "destroy" ]; then
+          terraform plan -destroy -no-color -input=false
+        else
+          terraform plan -no-color -input=false
+        fi
       continue-on-error: true
 
     - name: Update Pull Request
@@ -94,6 +108,11 @@ jobs:
       if: steps.plan.outcome == 'failure'
       run: exit 1
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+    - name: Terraform Apply/Destroy
+      if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      run: |
+        if [ "${{ inputs.action }}" == "destroy" ]; then
+          terraform destroy -auto-approve -input=false
+        else
+          terraform apply -auto-approve -input=false
+        fi
