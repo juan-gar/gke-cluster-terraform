@@ -19,5 +19,5 @@ variable "machine_type" {
 variable "node_count" {
   description = "The number of nodes in the custom node pool."
   type        = number
-  default     = 2
+  default     = 1
 }
