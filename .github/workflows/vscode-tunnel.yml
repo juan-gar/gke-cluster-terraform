@@ -1,0 +1,121 @@
+name: 'VS Code Tunnel - Deploy'
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  vscode-tunnel:
+    name: 'VS Code Tunnel - ${{ inputs.action }}'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./vscode-tunnel
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GKE }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.5.0"
+        terraform_wrapper: false
+
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+
+    - name: Terraform Init
+      id: init
+      run: |
+        terraform init \
+          -backend-config="bucket=sandbox-juangar-terraform-state" \
+          -backend-config="prefix=terraform/vscode-tunnel"
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      run: |
+        if [ "${{ inputs.action }}" == "destroy" ]; then
+          terraform plan -destroy -no-color -input=false
+        else
+          terraform plan -no-color -input=false
+        fi
+
+    - name: Terraform Apply/Destroy
+      id: apply
+      run: |
+        if [ "${{ inputs.action }}" == "destroy" ]; then
+          terraform destroy -auto-approve -input=false
+        else
+          terraform apply -auto-approve -input=false
+        fi
+
+    - name: Get Terraform Outputs
+      if: inputs.action == 'apply'
+      id: outputs
+      run: |
+        echo "instance_name=$(terraform output -raw instance_name)" >> $GITHUB_OUTPUT
+        echo "instance_zone=$(terraform output -raw instance_zone)" >> $GITHUB_OUTPUT
+        echo "external_ip=$(terraform output -raw external_ip)" >> $GITHUB_OUTPUT
+        echo "service_account=$(terraform output -raw service_account_email)" >> $GITHUB_OUTPUT
+
+    - name: Display Setup Instructions
+      if: inputs.action == 'apply'
+      run: |
+        echo "=================================================="
+        echo "VS Code Tunnel VM Deployed Successfully!"
+        echo "=================================================="
+        echo "Instance Name: ${{ steps.outputs.outputs.instance_name }}"
+        echo "Instance Zone: ${{ steps.outputs.outputs.instance_zone }}"
+        echo "External IP: ${{ steps.outputs.outputs.external_ip }}"
+        echo "Service Account: ${{ steps.outputs.outputs.service_account }}"
+        echo ""
+        echo "To complete the setup:"
+        echo "1. SSH into the VM:"
+        echo "   gcloud compute ssh ${{ steps.outputs.outputs.instance_name }} --zone=${{ steps.outputs.outputs.instance_zone }}"
+        echo ""
+        echo "2. Switch to the vscode-tunnel user:"
+        echo "   sudo su - vscode-tunnel"
+        echo ""
+        echo "3. Start the tunnel and authenticate:"
+        echo "   code tunnel --accept-server-license-terms"
+        echo ""
+        echo "4. Follow the authentication URL displayed"
+        echo ""
+        echo "5. After authentication, exit and enable the service:"
+        echo "   exit"
+        echo "   sudo systemctl enable vscode-tunnel"
+        echo "   sudo systemctl start vscode-tunnel"
+        echo ""
+        echo "6. Access your VS Code tunnel at:"
+        echo "   https://vscode.dev/tunnel/<machine-name>"
+        echo "=================================================="
