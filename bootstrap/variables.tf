@@ -1,7 +1,6 @@
 variable "project_id" {
-  description = "The Google Cloud project ID to deploy the resources in."
+  description = "The Google Cloud project ID."
   type        = string
-  default     = "sandbox-juangar"
 }
 
 variable "region" {
@@ -10,8 +9,7 @@ variable "region" {
   default     = "us-central1"
 }
 
-variable "service_account_email" {
-  description = "The service account email that will access the state bucket."
+variable "github_repo" {
+  description = "The GitHub repository allowed to authenticate via WIF (owner/repo)."
   type        = string
-  default     = "gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
 }

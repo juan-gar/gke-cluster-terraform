@@ -21,6 +21,10 @@ jobs:
     name: 'Bootstrap State Bucket - ${{ inputs.action }}'
     runs-on: ubuntu-latest
 
+    env:
+      TF_VAR_project_id:  ${{ vars.GCP_PROJECT_ID }}
+      TF_VAR_github_repo: ${{ github.repository }}
+
     defaults:
       run:
         shell: bash
@@ -34,12 +38,11 @@ jobs:
       uses: google-github-actions/auth@v3
       with:
         workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GCS}}
+        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT_GCS }}
         token_format: 'access_token'
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v3
-
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
@@ -62,17 +65,17 @@ jobs:
       id: plan
       run: |
         if [ "${{ inputs.action }}" == "destroy" ]; then
-          terraform plan -destroy -no-color -input=false -var="service_account_email=gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
+          terraform plan -destroy -no-color -input=false
         else
-          terraform plan -no-color -input=false -var="service_account_email=gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
+          terraform plan -no-color -input=false
         fi
 
     - name: Terraform Apply/Destroy
       run: |
         if [ "${{ inputs.action }}" == "destroy" ]; then
-          terraform destroy -auto-approve -input=false -var="service_account_email=gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
+          terraform destroy -auto-approve -input=false
         else
-          terraform apply -auto-approve -input=false -var="service_account_email=gcs-sa@sandbox-juangar.iam.gserviceaccount.com"
+          terraform apply -auto-approve -input=false
         fi
 
     - name: Output State Bucket Name

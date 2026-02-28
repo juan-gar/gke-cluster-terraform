@@ -6,17 +6,35 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
-  backend "gcs" {
-    bucket = "sandbox-juangar-terraform-state"
-    prefix = "terraform/state"
-  }
+
+  # Bootstrap uses local state because it creates the remote state bucket.
+  # Run this locally with `gcloud auth application-default login` first.
 }
 
 provider "google" {
   project = var.project_id
   region  = var.region
 }
+
+data "google_project" "current" {}
+
+# ---------- Enable required APIs ----------
+
+resource "google_project_service" "required_apis" {
+  for_each = toset([
+    "iam.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "sts.googleapis.com",
+    "container.googleapis.com",
+    "compute.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+  ])
+
+  service            = each.value
+  disable_on_destroy = false
+}
+
+# ---------- GCS state bucket ----------
 
 resource "google_storage_bucket" "terraform_state" {
   name     = "${var.project_id}-terraform-state"
@@ -46,11 +64,3 @@ resource "google_storage_bucket" "terraform_state" {
     }
   }
 }
-
-/* resource "google_storage_bucket_iam_member" "terraform_state_admin" {
-  bucket = google_storage_bucket.terraform_state.name
-  role   = "roles/storage.admin"
-  member = "serviceAccount:${var.service_account_email}"
-} */
-
-##
