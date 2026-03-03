@@ -1,6 +1,7 @@
 # Copy this file to terraform.tfvars and fill in your values.
 # terraform.tfvars is gitignored and will not be committed.
 
-project_id  = "your-gcp-project-id"
-region      = "us-central1"
-github_repo = "your-github-username/your-repo-name"
+project_id    = "your-gcp-project-id"
+region        = "us-central1"
+github_repo   = "your-github-username/your-repo-name"
+wif_pool_name = "projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID"

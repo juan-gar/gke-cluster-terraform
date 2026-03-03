@@ -13,3 +13,8 @@ variable "github_repo" {
   description = "The GitHub repository allowed to authenticate via WIF (owner/repo)."
   type        = string
 }
+
+variable "wif_pool_name" {
+  description = "The WIF pool resource name from the GCP console (projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID)."
+  type        = string
+}

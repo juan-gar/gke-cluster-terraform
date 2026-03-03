@@ -8,11 +8,6 @@ output "state_bucket_url" {
   value       = google_storage_bucket.terraform_state.url
 }
 
-output "wif_provider" {
-  description = "WIF provider resource name — set as WIF_PROVIDER GitHub secret"
-  value       = google_iam_workload_identity_pool_provider.github.name
-}
-
 output "service_account_gke" {
   description = "GKE service account email — set as WIF_SERVICE_ACCOUNT_GKE GitHub secret"
   value       = google_service_account.terraform_gke.email
