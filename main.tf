@@ -8,10 +8,7 @@ terraform {
     }
   }
 
-  backend "gcs" {
-    bucket = "sandbox-juangar-terraform-state"
-    prefix = "terraform/state"
-  }
+  backend "gcs" {}
 }
 
 # Configure the Google Cloud provider to manage resources.
