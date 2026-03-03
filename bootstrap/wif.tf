@@ -51,44 +51,19 @@ resource "google_storage_bucket_iam_member" "gcs_state_admin" {
   member = "serviceAccount:${google_service_account.terraform_gcs.email}"
 }
 
-# ---------- Workload Identity Federation ----------
-
-resource "google_iam_workload_identity_pool" "github" {
-  workload_identity_pool_id = "github-actions"
-  display_name              = "GitHub Actions"
-  description               = "Identity pool for GitHub Actions OIDC"
-
-  depends_on = [google_project_service.required_apis]
-}
-
-resource "google_iam_workload_identity_pool_provider" "github" {
-  workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
-  workload_identity_pool_provider_id = "github-oidc"
-  display_name                       = "GitHub OIDC"
-
-  attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.actor"      = "assertion.actor"
-    "attribute.repository" = "assertion.repository"
-  }
-
-  attribute_condition = "assertion.repository == \"${var.github_repo}\""
-
-  oidc {
-    issuer_uri = "https://token.actions.githubusercontent.com"
-  }
-}
-
 # ---------- WIF → Service Account Impersonation ----------
+# The WIF pool and provider are managed manually in the GCP console.
+# var.wif_pool_name is the pool resource name, e.g.:
+#   projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID
 
 resource "google_service_account_iam_member" "wif_gke" {
   service_account_id = google_service_account.terraform_gke.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_repo}"
+  member             = "principalSet://iam.googleapis.com/${var.wif_pool_name}/attribute.repository/${var.github_repo}"
 }
 
 resource "google_service_account_iam_member" "wif_gcs" {
   service_account_id = google_service_account.terraform_gcs.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_repo}"
+  member             = "principalSet://iam.googleapis.com/${var.wif_pool_name}/attribute.repository/${var.github_repo}"
 }
